@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта Грибского</title>
+    <style>
+        :root {
+            --bg-color: #f0f0f0;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --accent-color: #43a047; /* Цвет Rutube из вашей ссылки */
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-color); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            justify-content: center; 
+            min-height: 100vh;
+        }
+
+        .container { 
+            background: var(--card-bg); 
+            width: 100%; 
+            max-width: 700px; 
+            padding: 25px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            box-sizing: border-box;
+            align-self: flex-start;
+        }
+
+        h1 { margin-top: 0; color: #222; font-size: 24px; }
+        
+        #desc { 
+            font-size: 17px; 
+            line-height: 1.6; 
+            color: var(--text-main); 
+            margin-bottom: 20px; 
+            white-space: pre-line; /* Чтобы сохранялись переносы строк из JSON */
+        }
+
+        /* Общие стили для медиа (карта и видео) */
+        .media-wrapper { 
+            position: relative; 
+            width: 100%; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            background: #000; 
+            margin: 15px 0; 
+        }
+
+        .media-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: 0; 
+        }
+
+        /* Пропорции видео 16:9 */
+        .video-wrapper { padding-top: 56.25%; display: none; }
+        
+        /* Пропорции карты: по умолчанию 16:9 */
+        .map-wrapper { padding-top: 56.25%; }
+
+        /* Адаптивность для телефонов */
+        @media (max-width: 480px) {
+            body { padding: 10px; }
+            .container { padding: 20px; border-radius: 15px; }
+            h1 { font-size: 22px; }
+            .map-wrapper { padding-top: 100%; } /* Делаем карту квадратной и крупной */
+        }
+
+        /* Экран приветствия и ошибки */
+        #welcome-screen, .error-block { text-align: center; padding: 40px 10px; }
+        .nfc-icon { font-size: 70px; margin-bottom: 20px; display: block; }
+        
+        .hidden { display: none !important; }
+
+        .btn-retry {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="welcome-screen" class="hidden">
+        <span class="nfc-icon">📱✨</span>
+        <h1>Добро пожаловать!</h1>
+        <p>Чтобы увидеть информацию об объекте, пожалуйста, <strong>приложите телефон к интересующей Вас точке</strong> на карте.</p>
+    </div>
+
+    <div id="content-area" class="hidden">
+        <h1 id="title">Загрузка...</h1>
+        <div id="desc"></div>
+
+        <div id="media-container">
+            <div class="media-wrapper map-wrapper">
+                <iframe id="map-frame" src=""></iframe>
+            </div>
+
+            <div id="video-block" class="media-wrapper video-wrapper">
+                <iframe id="video-frame" src="" allow="clipboard-write; autoplay" allowFullScreen></iframe>
+            </div>
+        </div>
+
+        <div id="error-message" class="hidden">
+        </div>
+    </div>
+</div>
+
+<script>
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        const mapId = params.get('map');
+
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const contentArea = document.getElementById('content-area');
+        const mediaContainer = document.getElementById('media-container');
+        const errorMessage = document.getElementById('error-message');
+
+        // 1. Если параметра нет в ссылке
+        if (!mapId) {
+            welcomeScreen.classList.remove('hidden');
+            return;
+        }
+
+        // 2. Если параметр есть, показываем контентную область
+        contentArea.classList.remove('hidden');
+
+        try {
+            const response = await fetch('data.json');
+            if (!response.ok) throw new Error("Не удалось загрузить data.json");
+            
+            const locations = await response.json();
+            const data = locations[mapId];
+
+            if (data) {
+                // ДАННЫЕ НАЙДЕНЫ
+                document.getElementById('title').innerText = data.title;
+                document.getElementById('desc').innerText = data.description;
+                document.getElementById('map-frame').src = data.mapUrl;
+
+                // Проверка видео
+                const videoBlock = document.getElementById('video-block');
+                const videoFrame = document.getElementById('video-frame');
+                
+                if (data.videoUrl && data.videoUrl.trim() !== "") {
+                    videoFrame.src = data.videoUrl;
+                    videoBlock.style.display = 'block';
+                } else {
+                    videoBlock.style.display = 'none';
+                }
+
+                document.title = data.title;
+            } else {
+                // ДАННЫЕ НЕ НАЙДЕНЫ (404 внутри приложения)
+                showError("Ой, что-то пошло не так..", "Попробуйте приложить телефон еще раз, а если ошибка повторится, обратитесь к библиотекарю.");
+            }
+        } catch (e) {
+            console.error(e);
+            showError("Ошибка системы", "Не удалось загрузить базу данных. Проверьте интернет-соединение.");
+        }
+
+        function showError(title, text) {
+            document.getElementById('title').innerText = title;
+            document.getElementById('desc').innerText = text;
+            mediaContainer.classList.add('hidden'); // Скрываем черные фреймы
+            errorMessage.classList.remove('hidden'); // Показываем кнопку возврата
+        }
+    }
+
+    init();
+</script>
+
+</body>
+</html>
