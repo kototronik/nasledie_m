@@ -10,7 +10,7 @@
             --card-bg: #ffffff;
             --text-main: #333333;
             --text-muted: #666666;
-            --accent-color: #43a047; /* Цвет Rutube из вашей ссылки */
+            --accent-color: #43a047;
         }
 
         body { 
@@ -41,10 +41,9 @@
             line-height: 1.6; 
             color: var(--text-main); 
             margin-bottom: 20px; 
-            white-space: pre-line; /* Чтобы сохранялись переносы строк из JSON */
+            white-space: pre-line; 
         }
 
-        /* Общие стили для медиа (карта и видео) */
         .media-wrapper { 
             position: relative; 
             width: 100%; 
@@ -63,13 +62,13 @@
             border: 0; 
         }
 
-        /* Пропорции видео 16:9 */
+
         .video-wrapper { padding-top: 56.25%; display: none; }
         
-        /* Пропорции карты: по умолчанию 16:9 */
+
         .map-wrapper { padding-top: 56.25%; }
 
-        /* Адаптивность для телефонов */
+
         @media (max-width: 480px) {
             body { padding: 10px; }
             .container { padding: 20px; border-radius: 15px; }
@@ -77,7 +76,7 @@
             .map-wrapper { padding-top: 100%; } /* Делаем карту квадратной и крупной */
         }
 
-        /* Экран приветствия и ошибки */
+
         #welcome-screen, .error-block { text-align: center; padding: 40px 10px; }
         .nfc-icon { font-size: 70px; margin-bottom: 20px; display: block; }
         
@@ -133,13 +132,11 @@
         const mediaContainer = document.getElementById('media-container');
         const errorMessage = document.getElementById('error-message');
 
-        // 1. Если параметра нет в ссылке
         if (!mapId) {
             welcomeScreen.classList.remove('hidden');
             return;
         }
 
-        // 2. Если параметр есть, показываем контентную область
         contentArea.classList.remove('hidden');
 
         try {
@@ -150,12 +147,12 @@
             const data = locations[mapId];
 
             if (data) {
-                // ДАННЫЕ НАЙДЕНЫ
+
                 document.getElementById('title').innerText = data.title;
                 document.getElementById('desc').innerText = data.description;
                 document.getElementById('map-frame').src = data.mapUrl;
 
-                // Проверка видео
+
                 const videoBlock = document.getElementById('video-block');
                 const videoFrame = document.getElementById('video-frame');
                 
@@ -168,7 +165,7 @@
 
                 document.title = data.title;
             } else {
-                // ДАННЫЕ НЕ НАЙДЕНЫ (404 внутри приложения)
+
                 showError("Ой, что-то пошло не так..", "Попробуйте приложить телефон еще раз, а если ошибка повторится, обратитесь к библиотекарю.");
             }
         } catch (e) {
@@ -179,8 +176,8 @@
         function showError(title, text) {
             document.getElementById('title').innerText = title;
             document.getElementById('desc').innerText = text;
-            mediaContainer.classList.add('hidden'); // Скрываем черные фреймы
-            errorMessage.classList.remove('hidden'); // Показываем кнопку возврата
+            mediaContainer.classList.add('hidden'); 
+            errorMessage.classList.remove('hidden'); 
         }
     }
 
