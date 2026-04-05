@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            background-color: #f4f4f9; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; 
+            width: 100%; 
+            
+        }
+
+        .item { 
+            cursor: pointer; 
+            border-radius: 20px; 
+            background: #fff; 
+            border: 3px solid white; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            transition: 0.2s; 
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden; 
+            height: fit-content; 
+        }
+
+        .item:active { transform: scale(0.95); }
+
+        .item img { 
+            width: 100%; 
+            height: auto; 
+            display: block; 
+        }
+
+        #stop-fab { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            width: 75px; 
+            height: 75px; 
+            background-color: #ff4757; 
+            border: 5px solid white; 
+            border-radius: 50%; 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+            z-index: 1000; 
+            cursor: pointer; 
+        }
+
+        #stop-fab::before { 
+            content: ""; 
+            width: 25px; 
+            height: 25px; 
+            background-color: white; 
+            border-radius: 4px; 
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Нажмите на картинку</h2>
+    <div id="gallery" class="grid-container"></div>
+    <button id="stop-fab"></button>
+
+    <script>
+        const data = [
+            { "img": "rus.jpg", "snd": "rus.mp3" },
+            { "img": "iglu.jpg", "snd": "iglu.mp3" },
+            { "img": "sac.jpg", "snd": "sac.mp3" },
+            { "img": "urt.jpg", "snd": "bu.mp3" },
+            { "img": "dom.jpg", "snd": "chech.mp3" },
+            { "img": "tatar.jpg", "snd": "tatar.mp3" }
+        ];
+
+        const gallery = document.getElementById('gallery');
+        const stopFab = document.getElementById('stop-fab');
+        let currentAudio = null;
+
+        data.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'item';
+            const img = document.createElement('img');
+            img.src = item.img; 
+            
+            card.appendChild(img);
+            gallery.appendChild(card);
+
+            card.onclick = () => {
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                currentAudio = new Audio(item.snd);
+                currentAudio.play();
+                stopFab.style.display = 'flex';
+                currentAudio.onended = () => { stopFab.style.display = 'none'; };
+            };
+        });
+
+        stopFab.onclick = () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            stopFab.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
