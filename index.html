@@ -51,6 +51,7 @@
             overflow: hidden; 
             background: #000; 
             margin: 15px 0; 
+            display: none;
         }
 
         .media-wrapper iframe { 
@@ -62,12 +63,7 @@
             border: 0; 
         }
 
-
-        .video-wrapper { padding-top: 56.25%; display: none; }
-        
-
-        .map-wrapper { padding-top: 56.25%; }
-
+        .video-wrapper, .map-wrapper { padding-top: 56.25%; }
 
         @media (max-width: 480px) {
             body { padding: 10px; }
@@ -76,10 +72,8 @@
             .map-wrapper { padding-top: 100%; } 
         }
 
-
         #welcome-screen, .error-block { text-align: center; padding: 40px 10px; }
         .nfc-icon { font-size: 70px; margin-bottom: 20px; display: block; }
-        
         .hidden { display: none !important; }
 
         .btn-retry {
@@ -112,13 +106,12 @@
                 <iframe id="video-frame" src="" allow="clipboard-write; autoplay" allowFullScreen></iframe>
             </div>
 
-            <div class="media-wrapper map-wrapper">
+            <div id="map-block" class="media-wrapper map-wrapper">
                 <iframe id="map-frame" src=""></iframe>
             </div>
         </div>
 
-        <div id="error-message" class="hidden">
-        </div>
+        <div id="error-message" class="hidden"></div>
     </div>
 </div>
 
@@ -141,35 +134,40 @@
 
         try {
             const response = await fetch('data.json');
-            if (!response.ok) throw new Error("Не удалось загрузить data.json");
+            if (!response.ok) throw new Error();
             
             const locations = await response.json();
             const data = locations[mapId];
 
             if (data) {
-
                 document.getElementById('title').innerText = data.title;
                 document.getElementById('desc').innerText = data.description;
-                document.getElementById('map-frame').src = data.mapUrl;
-
+                document.title = data.title;
 
                 const videoBlock = document.getElementById('video-block');
                 const videoFrame = document.getElementById('video-frame');
-                
                 if (data.videoUrl && data.videoUrl.trim() !== "") {
                     videoFrame.src = data.videoUrl;
                     videoBlock.style.display = 'block';
                 } else {
                     videoBlock.style.display = 'none';
+                    videoFrame.src = "";
                 }
 
-                document.title = data.title;
-            } else {
+                const mapBlock = document.getElementById('map-block');
+                const mapFrame = document.getElementById('map-frame');
+                if (data.mapUrl && data.mapUrl.trim() !== "") {
+                    mapFrame.src = data.mapUrl;
+                    mapBlock.style.display = 'block';
+                } else {
+                    mapBlock.style.display = 'none';
+                    mapFrame.src = "";
+                }
 
+            } else {
                 showError("Ой, что-то пошло не так..", "Попробуйте приложить телефон еще раз, а если ошибка повторится, обратитесь к библиотекарю.");
             }
         } catch (e) {
-            console.error(e);
             showError("Ошибка системы", "Не удалось загрузить базу данных. Проверьте интернет-соединение.");
         }
 

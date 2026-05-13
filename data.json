@@ -53,5 +53,17 @@
         "mapUrl": "https://yandex.ru/map-widget/v1/?um=constructor%3A71b37fa7cefde03d3370ff868eb99e863b577856e65b1511c6de9c4f79bb97ee&amp;source=constructor",
         "videoUrl": "https://rutube.ru/play/embed/dba950ae3120a4fdf0a5282468d5844d/?p=zglwxdtStjxmV7DMwu5VyQ",
         "description": "Приглашаем вас посмотреть видео об опытном поле ДальГАУ (в прошлом БСХИ). Благодаря этому учебному хозяйству наше село получило новый виток развития в 60-70-80-е годы."
+    },
+    "efimova": {
+        "title": "Юлия Ефимова",
+        "mapUrl": "",
+        "videoUrl": "https://rutube.ru/play/embed/f80531a4c5d1022fd40be16cd6c6ce32/?p=jrw0kyvT5FEHz1D3run97g",
+        "description": "Юлия Ефимова - писатель. Живёт в г. Москва. Детство и юность Юлии прошли в селе Грибском"
+    },
+     "golovko": {
+        "title": " Александр Головко",
+        "mapUrl": "",
+        "videoUrl": "https://rutube.ru/play/embed/4489a6d93568db05bafb6b0d4ecf3cfb/?p=D8iYNpdXUMdgxeZwJ0uuYA",
+        "description": "Александр Головко - писатель. Живёт в г. Ессентуки. Жил в селе Грибском с 1955 по 1959 годы"
     }
 }
